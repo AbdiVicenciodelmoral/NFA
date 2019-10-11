@@ -39,28 +39,32 @@ stack *push(stack **topofStack, NFA *nfaPush)  {
     return newNFA;
 }
 
-NFA *pop(stack *currentTop) {
+stack *pop(stack *currentTop) {
     //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
     stack *topOfStack = currentTop;
    if(currentTop== NULL){
         return 0;
     } 
-   printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    NFA *poppedNFA = (NFA*)malloc(sizeof(NFA));
+   //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
+    //NFA *poppedNFA = (NFA*)malloc(sizeof(NFA));
     // prepare the value for return
-    poppedNFA = topOfStack->nfa;
+   // poppedNFA = topOfStack->nfa;
     //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
    // printf("topOFStack NFA NEXT StartState = %i \n",currentTop->next->nfa->startState);
     //printf("POPPEDNFA StartState = %i \n",poppedNFA->startState);
     // remove top element and free it
     currentTop = currentTop->next;
-    printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
+    //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
     //printf("topOFStack NFA NEXT StartState = %i \n",currentTop->next->nfa->startState);
     //free(topOfStack);
     //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    return poppedNFA;
+    return currentTop;
 }
 
+NFA *getNFA(stack *currentTop){
+    NFA *GetNfa = currentTop->nfa;
+    return GetNfa;
+}
 
 NFA *create(char c){
     //printf("I'm in Create \n");
@@ -106,10 +110,11 @@ int main() {
 		} 
 		else if (c == '|') {
 			n=0;
-
-		    NFA2 = pop(stacker);
+            
+		    NFA2 = getNFA(stacker);
             printf("NFA2 StartState = %i \n",NFA2->startState);
-			NFA1 = pop(stacker);
+            stacker = pop(stacker);
+			NFA1 = getNFA(stacker);
             printf("NFA1 StartState = %i \n",NFA1->startState);
 			//push(NFA that accepts L(nFA1) | L(nFA2));
 			//printf("TEST | \n");
@@ -145,5 +150,10 @@ int main() {
     return(0); 
 } 
   
+
+
+
+
+
 
 
