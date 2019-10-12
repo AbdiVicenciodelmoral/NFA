@@ -1,157 +1,150 @@
-#include <stdio.h>
-#include <stdlib.h>
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Scanner;
+import java.io.File;
+import java.util.Stack;
+
+public class Automata {
+
+    public static class transitions{
+        int Cstate;
+        int Nstate;
+        char symbol;
+        transitions Translist;
+    }
+
+    public static class  NFA{
+
+        int Sstate;
+        int Estate;
+        transitions TList;
+    }
+
+    public static NFA nfaMaker(char c,int num){
+
+        NFA newNFA = new NFA();
+        transitions tlist = new transitions();
+        newNFA.Sstate = num;
+        num++;
+        newNFA.Estate = num;
+        num++;
+        tlist.Cstate = newNFA.Sstate;
+        tlist.Nstate = newNFA.Estate;
+        tlist.symbol = c;
+        newNFA.TList = tlist;
+        //newNFA.TList.Nstate = newNFA.Estate;
+        //newNFA.TList.symbol = c;
+
+        return newNFA;
+    }
+
+    public static NFA And(NFA NFA1, NFA NFA2){
+        NFA andNFA = new NFA();
+        transitions tran = new transitions();
+        transitions tranTran = new transitions();
+        transitions tranTrantran = new transitions();
+
+        andNFA.Sstate = NFA1.Sstate;
+        andNFA.Estate = NFA2.Estate;
+       
+        tran.Cstate = NFA1.Sstate;
+        tran.Nstate = NFA1.Estate;
+        tran.symbol = NFA1.TList.symbol;
+        andNFA.TList = tran;
+
+        tranTran.Cstate = NFA1.Estate;
+        tranTran.Nstate = NFA2.Sstate;
+        tranTran.symbol = 'E';
+        andNFA.TList.Translist = tranTran;
+
+        tranTrantran.Cstate = NFA2.Sstate;
+        tranTrantran.Nstate = NFA2.Estate;
+        tranTrantran.symbol = NFA2.TList.symbol;
+        andNFA.TList.Translist.Translist = tranTrantran;
+        //transitions tranTran = new transitions();
+       // tranTran.Cstate = NFA1.Estate;
+        //tranTran.Nstate = NFA2.Sstate;
+       // tranTran.symbol = 'E';
+        //NFA1.Estate = NFA2.Estate;
+        //NFA1.TList.Translist = tranTran;
+        
+        
+        
+        //System.out.println(NFA1.Sstate);
+        //System.out.println(NFA1.Estate);
+        //System.out.println(NFA1.TList.symbol);
+        //System.out.println(NFA1.TList.Translist.Cstate);
+        //System.out.println(NFA1.TList.Translist.Nstate);
+        //System.out.println(NFA1.TList.Translist.symbol);
+        return NFA1;
+    }
+
+    public static void main(String args[]) throws FileNotFoundException {
+        //int num = 0;
+
+        File infile = new File(args[0]);
+        Scanner input = new Scanner(infile);
+        Stack<NFA> stack = new Stack<NFA>();
+
+        // System.out.println(input.next());
+        //int i = 0;
 
 
-int num =0;
-typedef struct trans{
-    int state1;
-    int state2;
-    char symbol;
-    struct trans *Tlist;
+        while(input.hasNext()){
+            int num = 0;
+            String reader = input.next();
+            char [] holder = reader.toCharArray();
 
-}Transitions;
-
-typedef struct nfa{
-    int startState;
-    int endState;
-    Transitions *Tlist;
-}NFA;
+            for (Character c:holder) {
 
 
-typedef struct stacker {
-   NFA * nfa;
-   struct stacker *next;    
-}stack;
+               // System.out.println(c);
+                if (c.equals('&')) {
+                    //nFA2 = pop();
+                    //nFA1 = pop();
+                    //push(NFA that accepts the concatenation of L(nFA1) followed by L(nFA2));
+                    // printf("TEST & \n");
+                    NFA NFA2 = stack.pop();
+                    NFA NFA1 = stack.pop();
+                    stack.push(And(NFA1, NFA2));
+                    
+                    
+                }
+                else if (c.equals('|')) {
 
 
-void *push(stack **topofStack, NFA *nfaPush)  {    
-    stack *newNFA =(stack*)malloc(sizeof(stack)); 
-     
-   //newbie = (struct stack_entry *)malloc(sizeof(struct stack_entry));
-    //if(!newbie) {
-     //   return 0;
-   // }
+                }
+                else if (c.equals('*')) {
 
-    newNFA->nfa = nfaPush;
+                    //nFA = pop();
+                    //push(NFA that accepts L(nFA) star);
+                    //printf("TEST \n");
+                    //printf("Letter:%i",c);
+                }
+                else if( c == 13 || c == 10){
+                    break;
+                }
+                else{
 
-    newNFA->next = *topofStack;
-    *topofStack = newNFA;
-   // return newNFA;
+                    //nfaMaker(c,num);
+                   // nfaMaker(c,num);
+                    stack.push(nfaMaker(c,num));
+                    num++;
+                    num++;
+                   // NFA test = stack.pop();
+                    //System.out.println(test.Sstate);
+                    //System.out.println(test.Estate);
+                }
+              
+
+            }
+
+
+        }
+
+
+        input.close();
+
+    }
 }
-
-stack *pop(stack *currentTop) {
-    //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    stack *topOfStack = currentTop;
-   if(currentTop== NULL){
-        return 0;
-    } 
-   //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    //NFA *poppedNFA = currentTop->nfa;
-    // prepare the value for return
-   // poppedNFA = currentTop->nfa;
-    //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-   // printf("topOFStack NFA NEXT StartState = %i \n",currentTop->next->nfa->startState);
-    //printf("POPPEDNFA StartState = %i \n",poppedNFA->startState);
-    // remove top element and free it
-    currentTop = currentTop->next;
-    //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    //printf("topOFStack NFA NEXT StartState = %i \n",currentTop->next->nfa->startState);
-    //free(topOfStack);
-    //printf("topOFStack NFA StartState = %i \n",currentTop->nfa->startState);
-    return currentTop;
-}
-
-NFA *getNFA(stack *currentTop){
-    NFA *GetNfa = currentTop->nfa;
-    return GetNfa;
-}
-
-NFA *create(char c){
-    //printf("I'm in Create \n");
-    NFA *newNFA = (NFA*)malloc(sizeof(NFA));
-    newNFA->startState = num;
-    num++;
-    newNFA->endState = num;
-	num++;
-    Transitions *newT = (Transitions*)malloc(sizeof(Transitions));
-    newT->state1 = newNFA->startState;
-    newT->state2 = newNFA->endState;
-    //printf("CHAR = %c \n",c);
-    newT->symbol = c;
-    
-    newNFA->Tlist = newT;
-    return newNFA;
-}
-
-
-int main() {
-
-	stack *stacker =(stack*)malloc(sizeof(stack));
-    NFA *NFA1; 
-    NFA *NFA2;
-
-    FILE *fp = fopen("tester.txt","r");
-   	//char c; 
-	int n =0;
-	char c;
-  	while ((c = fgetc(fp))!=EOF){
-		//c = fgetc(fp);
-		// if(feof(fp)){
-     	//	break ;
-		//}
-  		//putchar(c); 
-  		//c = next character in postfix expression;
-		if (c == '&') {
-			n= 0;
-			//nFA2 = pop();
-			//nFA1 = pop();
-			//push(NFA that accepts the concatenation of L(nFA1) followed by L(nFA2));
-			printf("TEST & \n");
-		} 
-		else if (c == '|') {
-			n=0;
-            
-		    NFA2 = getNFA(stacker);
-            printf("NFA2 StartState = %i \n",NFA2->startState);
-            stacker = pop(stacker);
-			NFA1 =getNFA(stacker);
-            printf("NFA1 StartState = %i \n",NFA1->startState);
-            stacker = pop(stacker);
-            
-
-			//push(NFA that accepts L(nFA1) | L(nFA2));
-			//printf("TEST | \n");
-			//putchar(c);
-		} 
-		else if (c == '*') {
-			n=0;
-			//nFA = pop();
-			//push(NFA that accepts L(nFA) star);
-			//printf("TEST \n");
-			//printf("Letter:%i",c);
-		} 
-		else if( c == 13 || c == 10){
-			break;
-		}
-		else{
-		//push(NFA that accepts a single character c);
-		//printf("TEST Letter \n")
-        push(&stacker,create(c));
-       // n++;
-		//printf("Letter:%i",c);
-		//printf("TEST\n");
-		}
-	
-
-  		
-  	}
-	//printf("First NFA StartState = %i \n",stacker->nfa->startState);
-    //printf("First NFA StartState = %i \n",stacker->nfa->endState);
-    //printf("First Transition Symbol = %c \n",stacker->nfa->Tlist->symbol);
-
-	
-    return(0); 
-} 
-  
-
-
