@@ -1,4 +1,4 @@
-java.io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
@@ -22,8 +22,8 @@ public class Automata {
         transitions TList;
     }
 
+    //Creates an new NFA every time its called
     public static NFA nfaMaker(char c,int num){
-
         NFA newNFA = new NFA();
         transitions tlist = new transitions();
         newNFA.Sstate = num;
@@ -34,12 +34,10 @@ public class Automata {
         tlist.Nstate = newNFA.Estate;
         tlist.symbol = c;
         newNFA.TList = tlist;
-        //newNFA.TList.Nstate = newNFA.Estate;
-        //newNFA.TList.symbol = c;
-
         return newNFA;
     }
 
+    //Updates the NFA with the 'AND' operator
     public static NFA And(NFA NFA1, NFA NFA2){
         //Create a transition class
         transitions tran = new transitions();
@@ -66,18 +64,16 @@ public class Automata {
 
         return NFA1;
     }
-
+    //Updates the NFA with the '*' operator
     public static NFA STAR(NFA oldNFA,int num){
         NFA starNFA = new NFA();
         starNFA.Sstate = num;
         starNFA.Estate = num;
-
         transitions tr = new transitions();
         tr.Cstate = starNFA.Sstate;
         tr.Nstate = oldNFA.Sstate;
         tr.symbol = 'E';
         tr.Tlist = oldNFA.TList;
-
         transitions tempTran = new transitions();
         tempTran = oldNFA.TList;
         while (tempTran != null) {
@@ -86,22 +82,19 @@ public class Automata {
             }
             tempTran = tempTran.Tlist;
         }
-
         transitions lastTr = new transitions();
         lastTr.Cstate = tempTran.Nstate;
         lastTr.Nstate = starNFA.Sstate;
         lastTr.symbol = 'E';
-
         tempTran.Tlist = lastTr;
         starNFA.TList = tr;
         return starNFA;
     }
-
+    //Updates the NFA with the 'OR' operator
     public static NFA OR(NFA NFA1,NFA NFA2, int num){
         NFA orNFA = new NFA();
         orNFA.Sstate = num;
         orNFA.Estate = num+1;
-
         transitions firstTr = new transitions();
         firstTr.Cstate = orNFA.Sstate;
         firstTr.symbol = 'E';
@@ -124,60 +117,41 @@ public class Automata {
             }
             NFA2Tran = NFA2Tran.Tlist;
         }
-
         transitions N1Epsilon = new transitions();
         N1Epsilon.Cstate = NFA1.Estate;
         N1Epsilon.Nstate = orNFA.Estate;
         N1Epsilon.symbol = 'E';
-
         transitions N2Epsilon = new transitions();
         N2Epsilon.Cstate = NFA2.Estate;
         N2Epsilon.Nstate = orNFA.Estate;
         N2Epsilon.symbol = 'E';
-
-        //orNFA.TList = firstTr;
         NFA1Tran.Tlist = N1Epsilon;
         NFA2Tran.Tlist = N2Epsilon;
         NFA1Tran.Tlist.Tlist = NFA2.TList;
         orNFA.TList.Tlist = NFA1.TList;
-
         return orNFA;
     }
 
-
-
-
     public static void main(String args[]) throws FileNotFoundException {
-        int count = 0;
+        int count = 1;
 
         File infile = new File("src/SampleTestfile.txt");
         Scanner input = new Scanner(infile);
         Stack<NFA> stack = new Stack<NFA>();
 
-        // System.out.println(input.next());
-        //int i = 0;
-
-
+        //Receive input and iterate until the EOF
+        //Comparing each character and calling the
+        //appropriate method.
         while(input.hasNext()){
             int num = 0;
             String reader = input.next();
             char [] holder = reader.toCharArray();
 
             for (Character c:holder) {
-
-
-                // System.out.println(c);
                 if (c.equals('&')) {
-                    //nFA2 = pop();
-                    //nFA1 = pop();
-                    //push(NFA that accepts the concatenation of L(nFA1) followed by L(nFA2));
-                    // printf("TEST & \n");
                     NFA NFA2 = stack.pop();
                     NFA NFA1 = stack.pop();
                     stack.push(And(NFA1, NFA2));
-
-
-
                 }
                 else if (c.equals('|')) {
                     NFA NFA2 = stack.pop();
@@ -187,33 +161,20 @@ public class Automata {
                     num++;
                 }
                 else if (c.equals('*')) {
-
-
                     NFA NFA1 = stack.pop();
                     stack.push(STAR(NFA1, num));
                     num++;
-                    //push(NFA that accepts L(nFA) star);
-                    //printf("TEST \n");
-                    //printf("Letter:%i",c);
                 }
                 else{
-
-                    //nfaMaker(c,num);
-                    // nfaMaker(c,num);
-
                     stack.push(nfaMaker(c,num));
                     num++;
                     num++;
-                    // NFA test = stack.pop();
-                    //System.out.println(test.Sstate);
-                    //System.out.println(test.Estate);
                 }
-
-
             }
 
+            //Here we pop the last NFA and printout all of its content
             NFA getBack = stack.pop();
-            System.out.println("Count: "+count);
+            //System.out.println("Count: "+count);
             count++;
             if(getBack.TList.Nstate2 != 0){
                 System.out.format("S(q%d,%c)-> q%d,q%d \n",getBack.TList.Cstate, getBack.TList.symbol ,getBack.TList.Nstate,getBack.TList.Nstate2);
@@ -237,9 +198,6 @@ public class Automata {
             }
             System.out.println("_____________________________________________________________________________________________");
         }
-
-
         input.close();
-
     }
 }
