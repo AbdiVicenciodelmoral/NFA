@@ -1,2 +1,2 @@
-#Convert regular expressions into FAs
+# Convert regular expressions into FAs
 Automata Program NFA construction
