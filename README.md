@@ -1,4 +1,4 @@
-# Convert regular expressions into FAs
+# Convert regular expressions into FAs (Finite Automatata)
 Automata Program NFA construction
 
 
